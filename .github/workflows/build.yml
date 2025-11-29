@@ -1,0 +1,30 @@
+name: Build and Upload Docker Image
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Pull Redis Stack Image
+        run: |
+          docker pull redis/redis-stack:latest
+
+      - name: Save Docker Image to tar
+        run: |
+          docker save redis/redis-stack:latest -o redis-stack.tar
+          ls -lh redis-stack.tar
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: redis-stack-tar
+          path: redis-stack.tar
+          retention-days: 7
